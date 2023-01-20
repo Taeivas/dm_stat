@@ -15,5 +15,6 @@
 // BEGIN_INCLUDE
 #include "atom.dm"
 #include "stat.dm"
+#include "vital.dm"
 // END_INCLUDE
 

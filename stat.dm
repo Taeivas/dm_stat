@@ -1,70 +1,181 @@
-stat_limit
-	New(min, max)
-		if(isnum(min))
-			src.min = min
-		if(isnum(max))
-			src.max = max
-	var
-		min = 0
-		max = 10
 stat
 	New()
-		for(var/a in args)
-			src += a
-		Update()
+		src += args
 	var
 		const
-			ROUND_DEFAULT = 0
-			ROUND_DOWN = 1
-			ROUND_UP = 2
+			STAT_DEFAULT = 1
+			STAT_MIN = 2
+			STAT_MAX = 4
+			STAT_FLOOR = 8
+			STAT_ABS = 16
+			STAT_CEIL = 32
+			STAT_ROUND = 64
+			STAT_FORMULA = 128
+		tmp
+			pause_stat = FALSE
 		name
-		current = 0
-		base =  0
+		desc
+		value = 0
+		base = 0
+		mode = STAT_DEFAULT
+		round_digit = 1
 		stat
 			multiplier
+			base_min
+			base_max
+			value_min
+			value_max
 		contents[] = new
 		locs[] = new
-		round_mode
-
-		stat_limit
-			limit
 	proc
-		ToString()
-			. = "[name]: [current]"
+		Formula(n)
+			return n
 		Update()
-			. = current
-			current = base
-			for(var/stat/s in contents)
-				current += s.current
-			if(multiplier)
-				if(isnum(multiplier))
-					current *= multiplier
-				else if(istype(multiplier, /stat))
-					current *= multiplier.current
-			if(round_mode != null)
-				switch(round_mode)
-					if(ROUND_DEFAULT)
-						current = round(current, 1)
-					if(ROUND_DOWN)
-						current = round(current)
-					if(ROUND_UP)
-						current = -round(-current)
-			if(istype(limit, /stat_limit))
-				if(isnum(limit.min))
-					current = max(limit.min, current)
-				if(isnum(limit.max))
-					current = min(limit.max, current)
-			if(. != current)
-				for(var/atom/a in locs)
-					a.OnStatUpdate(src, .)
-				for(var/stat/s in locs)
-					s.Update()
-		operator&=(value)
-			base = value
-			Update()
+			if(pause_stat)
+				return FALSE
+			else
+				. = value
+				value = base
+				var/L[] = new
+				for(var/stat/s in contents)
+					if(mode & STAT_DEFAULT)
+						value += mode & STAT_ABS ? abs(s.value) : s.value
+					else if(mode & STAT_MIN|STAT_MAX)
+						L += mode & STAT_ABS ? abs(s.value) : s.value
+
+				if(mode & STAT_MIN)
+					value = min(L)
+				else if(mode & STAT_MAX)
+					value = max(L)
+
+				if(multiplier)
+					if(isnum(multiplier))
+						value *= multiplier
+					else if(istype(multiplier, /stat))
+						value *= multiplier.value
+
+				if(mode & STAT_FORMULA)
+					value = Formula(value)
+
+				if(mode & STAT_FLOOR)
+					value = round(value)
+				else if(mode & STAT_CEIL)
+					value = -round(-value)
+				else if(mode & STAT_ROUND)
+					value = round(value, round_digit)
+
+				value = LimitStatValue(value)
+
+				if(. != value)
+					if(locs && locs.len)
+						for(var/stat/s in locs)
+							s.Update()
+						for(var/atom/a in locs)
+							a.OnUpdateStat(src, ., value)
+					return TRUE
+				else
+					return FALSE
+		Set(value)
+			if(isnum(value))
+				src &= value
+				Update()
+		LimitStatBase(base)
+			if(base_min != null)
+				if(isnum(base_min))
+					base = max(base_min, base)
+				else if(istype(base_min, /stat))
+					base = max(base_min.value, base)
+			if(base_max != null)
+				if(isnum(base_max))
+					base = min(base_max, base)
+				else if(istype(base_max, /stat))
+					base = min(base_max.value, base)
+			return base
+		LimitStatValue(value)
+			if(value_min != null)
+				if(isnum(value_min))
+					value = max(value_min, value)
+				else if(istype(value_min, /stat))
+					value = max(value_min.value, value)
+			if(value_max != null)
+				if(isnum(value_max))
+					value = min(value_max, value)
+				else if(istype(value_max, /stat))
+					value = min(value_max.value, value)
+			return value
+		operator""()
+			. = "[name]: [value]"
+			if(desc != null)
+				. += "\n\t[desc]"
 		operator+=(stat/s)
 			if(isnum(s))
 				base += s
+				Update()
+			else if(istype(s, /stat))
+				base += s.value
+				Update()
+			else if(istype(s, /atom))
+				locs += s
+			else if(istext(s))
+				if(name == initial(name))
+					name = s
+				else if(desc == initial(desc))
+					desc = s
+			else if(islist(s))
+				pause_stat = TRUE
+				for(var/a in s)
+					src += a
+				pause_stat = FALSE
+				Update()
+		operator-=(stat/s)
+			if(isnum(s))
+				base -= s
+				Update()
+			else if(istype(s, /stat))
+				base -= s.value
+				Update()
+			else if(istype(s, /atom))
+				locs -= s
+			else if(istext(s))
+				if(name != initial(name))
+					name = initial(name)
+				else if(desc != initial(desc))
+					desc = initial(desc)
+			else if(islist(s))
+				pause_stat = TRUE
+				for(var/a in s)
+					src -= a
+				pause_stat = FALSE
+				Update()
+		operator*=(stat/s)
+			if(isnum(s))
+				base *= s
+				Update()
+			else if(istype(s, /stat))
+				base *= s.value
+				Update()
+			else if(islist(s))
+				pause_stat = TRUE
+				for(var/a in s)
+					src *= a
+				pause_stat = FALSE
+				Update()
+		operator/=(stat/s)
+			if(isnum(s))
+				base /= s
+				Update()
+			else if(istype(s, /stat))
+				base /= s.value
+				Update()
+			else if(islist(s))
+				pause_stat = TRUE
+				for(var/a in s)
+					src /= a
+				pause_stat = FALSE
+				Update()
+		operator&=(stat/s)
+			if(isnum(s))
+				base = LimitStatBase(s)
 				Update()
 			else if(istype(s, /stat))
 				contents += s
@@ -72,95 +183,22 @@ stat
 				Update()
 			else if(istype(s, /atom))
 				locs += s
-			else if(istype(s, /list))
+			else if(islist(s))
+				pause_stat = TRUE
 				for(var/a in s)
-					src += a
-		operator-=(stat/s)
-			if(isnum(s))
-				base -= s
+					src &= a
+				pause_stat = FALSE
 				Update()
-			else if(istype(s, /stat))
+		operator|=(stat/s)
+			if(istype(s, /stat))
 				contents -= s
 				s.locs -= src
 				Update()
 			else if(istype(s, /atom))
 				locs -= s
-			else if(istype(s, /list))
+			else if(islist(s))
+				pause_stat = TRUE
 				for(var/a in s)
-					src -= a
-		operator+(stat/s)
-			. = current
-			if(istype(s, /stat))
-				. += s.current
-			else if(isnum(s))
-				. += s
-		operator-(stat/s)
-			. = current
-			if(istype(s, /stat))
-				. -= s.current
-			else if(isnum(s))
-				. -= s
-	vital
-		var
-			current_tmp = 0
-			auto_adjust = TRUE
-			tmp
-				recovery = FALSE
-			stat
-				recovery_rate = 1
-			recovery_delay = 60
-		New()
-			. = ..()
-			UpdateVital(current_tmp)
-			spawn Recovery()
-		Update()
-			. = ..()
-			if(. != current && auto_adjust)
-				var/prev = current_tmp
-				current_tmp += (current - .)
-				UpdateVital(prev)
-		ToString()
-			. = "[name]: [current_tmp]/[current]"
-		proc
-			UpdateVital(prev_current_tmp)
-				for(var/atom/a in locs)
-					a.OnVitalUpdate(src, prev_current_tmp)
-			operator*=(stat/s)
-				var/prev = current_tmp
-				if(istype(s, /stat))
-					current_tmp += s.current
-				else if(isnum(s))
-					current_tmp += s
-				else if(islist(s))
-					for(var/a in s)
-						src *= a
-				if(prev != current_tmp)
-					UpdateVital(prev)
-				spawn Recovery()
-			operator/=(stat/s)
-				var/prev = current_tmp
-				if(istype(s, /stat))
-					current_tmp -= s.current
-				else if(isnum(s))
-					current_tmp -= s
-				else if(islist(s))
-					for(var/a in s)
-						src /= a
-				if(prev != current_tmp)
-					UpdateVital(prev)
-				spawn Recovery()
-			Recovery()
-				set waitfor = FALSE
-				if(!recovery_rate || (recovery && recovery_rate))
-					return
-				recovery = TRUE
-				while(recovery_rate)
-					sleep(recovery_delay)
-					if(current_tmp < current)
-						if(istype(recovery_rate, /stat))
-							src *= min(current - current_tmp, recovery_rate.current)
-						else if(isnum(recovery_rate))
-							src *= min(current - current_tmp, recovery_rate)
-					if(current_tmp >= current)
-						break
-				recovery = FALSE
+					src |= a
+				pause_stat = FALSE
+				Update()
