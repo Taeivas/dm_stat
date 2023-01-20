@@ -150,10 +150,11 @@ stat
 					UpdateVital(prev)
 				spawn Recovery()
 			Recovery()
-				if(recovery && recovery_rate)
+				set waitfor = FALSE
+				if(!recovery_rate || (recovery && recovery_rate))
 					return
 				recovery = TRUE
-				while(1)
+				while(recovery_rate)
 					sleep(recovery_delay)
 					if(current_tmp < current)
 						if(istype(recovery_rate, /stat))
