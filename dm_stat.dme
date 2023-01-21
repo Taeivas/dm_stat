@@ -13,8 +13,8 @@
 // END_PREFERENCES
 
 // BEGIN_INCLUDE
-#include "atom.dm"
-#include "stat.dm"
-#include "vital.dm"
+#include "scripts\stat\atom.dm"
+#include "scripts\stat\stat.dm"
+#include "scripts\stat\vital.dm"
 // END_INCLUDE
 
