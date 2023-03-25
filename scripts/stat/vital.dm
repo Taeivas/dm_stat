@@ -30,9 +30,9 @@ stat
 				if(recovery)
 					return FALSE
 				recovery = TRUE
-				while(recovery)
+				while(recovery && current < value)
 					sleep(recovery_delay)
-					src >>= recovery_rate
+					src >>= min(recovery_rate, value - recovery_rate)
 					if(current >= value)
 						break
 				recovery = FALSE
