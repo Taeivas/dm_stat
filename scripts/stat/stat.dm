@@ -40,7 +40,7 @@ stat
 				for(var/stat/s in contents)
 					if(mode & STAT_DEFAULT)
 						value += mode & STAT_ABS ? abs(s.value) : s.value
-					else if(mode & STAT_MIN|STAT_MAX)
+					else if(mode & (STAT_MIN | STAT_MAX))
 						L += mode & STAT_ABS ? abs(s.value) : s.value
 
 				if(mode & STAT_MIN)
@@ -124,7 +124,10 @@ stat
 			else if(islist(s))
 				pause_stat = TRUE
 				for(var/a in s)
-					src += a
+					if(istype(a, /stat))
+						src &= a
+					else
+						src += a
 				pause_stat = FALSE
 				Update()
 		operator-=(stat/s)
