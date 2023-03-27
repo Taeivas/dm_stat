@@ -64,7 +64,7 @@ stat
 				else if(mode & STAT_ROUND)
 					value = round(value, round_digit)
 
-				value = LimitStatValue(value)
+				value = LimitValue(value)
 
 				if(. != value)
 					if(locs && locs.len)
@@ -79,7 +79,7 @@ stat
 			if(isnum(value))
 				src &= value
 				Update()
-		LimitStatBase(base)
+		LimitBase(base)
 			if(base_min != null)
 				if(isnum(base_min))
 					base = max(base_min, base)
@@ -91,7 +91,7 @@ stat
 				else if(istype(base_max, /stat))
 					base = min(base_max.value, base)
 			return base
-		LimitStatValue(value)
+		LimitValue(value)
 			if(value_min != null)
 				if(isnum(value_min))
 					value = max(value_min, value)
@@ -110,9 +110,11 @@ stat
 		operator+=(stat/s)
 			if(isnum(s))
 				base += s
+				base = LimitBase(base)
 				Update()
 			else if(istype(s, /stat))
 				base += s.value
+				base = LimitBase(base)
 				Update()
 			else if(istype(s, /atom))
 				locs += s
@@ -133,9 +135,11 @@ stat
 		operator-=(stat/s)
 			if(isnum(s))
 				base -= s
+				base = LimitBase(base)
 				Update()
 			else if(istype(s, /stat))
 				base -= s.value
+				base = LimitBase(base)
 				Update()
 			else if(istype(s, /atom))
 				locs -= s
@@ -153,9 +157,11 @@ stat
 		operator*=(stat/s)
 			if(isnum(s))
 				base *= s
+				base = LimitBase(base)
 				Update()
 			else if(istype(s, /stat))
 				base *= s.value
+				base = LimitBase(base)
 				Update()
 			else if(islist(s))
 				pause_stat = TRUE
@@ -166,9 +172,11 @@ stat
 		operator/=(stat/s)
 			if(isnum(s))
 				base /= s
+				base = LimitBase(base)
 				Update()
 			else if(istype(s, /stat))
 				base /= s.value
+				base = LimitBase(base)
 				Update()
 			else if(islist(s))
 				pause_stat = TRUE
@@ -178,7 +186,7 @@ stat
 				Update()
 		operator&=(stat/s)
 			if(isnum(s))
-				base = LimitStatBase(s)
+				base = LimitBase(s)
 				Update()
 			else if(istype(s, /stat))
 				contents += s
