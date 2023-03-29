@@ -35,6 +35,7 @@ stat
 				return FALSE
 			else
 				. = value
+				base = LimitBase(base)
 				value = base
 				var/L[] = new
 				for(var/stat/s in contents)
