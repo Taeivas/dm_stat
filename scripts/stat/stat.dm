@@ -224,3 +224,18 @@ stat
 				return value - s.value
 			else if(isnum(s))
 				return value - s
+		operator*(stat/s)
+			if(istype(s, /stat))
+				return value * s.value
+			else if(isnum(s))
+				return value * s
+		operator/(stat/s)
+			if(istype(s, /stat))
+				return value / s.value
+			else if(isnum(s))
+				return value / s
+		operator**(stat/s)
+			if(istype(s, /stat))
+				return value ** s.value
+			else if(isnum(s))
+				return value ** s
