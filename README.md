@@ -18,6 +18,7 @@ The `/stat` library offers a powerful and versatile solution for handling charac
     - [Vital Statistics](#vital-statistics)
     - [Reading Statistics](#reading-statistics)
     - [Arithmetic Operations with Statistics](#arithmetic-operations-with-statistics)
+  - [Stat Modes of Operation](#stat-modes-of-operation)
   - [Operators](#operators)
     - [`operator""()`](#operator)
     - [`operator+=(stat/s)`](#operatorstats)
@@ -195,6 +196,24 @@ var
     damage = attack - defense // Returns the value `5`
 ```
 
+## Stat Modes of Operation
+
+The `/stat` library provides various operational modes that determine how statistics calculations are processed. These modes can be configured using the `mode` parameter and they dictate how the `Update()` function treats a given statistic's value.
+
+The library provides several constants that represent these modes, which can be combined to achieve desired behaviour:
+- `STAT_DEFAULT`: Default mode of operation. When the value is updated, it simply adds the values of the statistics in the `contents` array.
+- `STAT_MIN` and `STAT_MAX`: In these modes, when updating the value, it will consider the minimum or maximum value in the `contents` array, respectively.
+- `STAT_ABS`: This mode ensures that the updated value is always absolute, negating any negative values.
+- `STAT_FLOOR`, `STAT_CEIL`, and `STAT_ROUND`: These modes round the updated value down to the nearest whole number (`STAT_FLOOR`), up to the nearest whole number (`STAT_CEIL`), or to the nearest whole number (`STAT_ROUND`) respectively. `STAT_ROUND` can be used with `mode_round_digit` to round to a specified digit.
+- `STAT_PROC`: In this mode, the value is processed by a user-defined function specified in `mode_proc`.
+
+The `Update()` function handles the computation of the statistic's value based on the current mode. It also triggers the "update" and "change" events as needed.
+
+For instance, it performs addition when `STAT_DEFAULT` is set, looks for the minimum or maximum value when `STAT_MIN` or `STAT_MAX` is set respectively, and applies the user-defined function when `STAT_PROC` is set.
+
+The function also handles the case when a multiplier is applied to the base value and clamps the value within a limit if a limit is specified. The rounding or truncation operations (`STAT_FLOOR`, `STAT_CEIL`, `STAT_ROUND`) and absolute operation (`STAT_ABS`) are also applied as per the set mode.
+
+Lastly, if any changes to the statistic are detected, the function triggers the necessary events and forces all statistics linked to the current one to update.
 
 ## Operators
 
