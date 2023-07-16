@@ -1,6 +1,6 @@
 # BYOND Dream Maker `/stat` Library
 
-The `/stat` library offers a powerful and versatile solution for handling character statistics in your games or simulations. It simplifies the creation and manipulation of statistics like strength, speed, health, and more. It provides robust arithmetic operations, flexible binding/unbinding of statistics, customizable modes for different stats, easy reading of values, and extensibility through operator overloading. Whether you're creating an RPG, strategy game, or a complex simulation, the `/stat `library is the tool you need to manage your character stats effectively and efficiently.
+The `/stat` library offers a powerful and versatile solution for handling character statistics in your games or simulations. It simplifies the creation and manipulation of statistics like strength, speed, health, and more. It provides robust arithmetic operations, flexible binding/unbinding of statistics, customizable modes for different stats, easy reading of values, and extensibility through operator overloading. Whether you're creating an RPG, strategy game, or a complex simulation, the `/stat` library is the tool you need to manage your character stats effectively and efficiently.
 
 - [BYOND Dream Maker `/stat` Library](#byond-dream-maker-stat-library)
 - [Installation](#installation)
@@ -11,7 +11,8 @@ The `/stat` library offers a powerful and versatile solution for handling charac
       - [3. Add the `/stat` library as a submodule](#3-add-the-stat-library-as-a-submodule)
       - [4. Initialize and fetch the submodule](#4-initialize-and-fetch-the-submodule)
 - [Usage](#usage)
-    - [Statistic Definitions](#statistic-definitions)
+    - [Defining Statistics](#defining-statistics)
+    - [Extending Character Statistics](#extending-character-statistics)
     - [Statistic Relationships: Binding and Unbinding](#statistic-relationships-binding-and-unbinding)
     - [Modes of Operation](#modes-of-operation)
     - [Vital Statistics](#vital-statistics)
@@ -82,39 +83,53 @@ Conversely, `/stat/vital` is a more dynamic statistical component, extending the
 
 In essence, `/stat` provides a base statistical value, while `/stat/vital` adds another layer of complexity by tracking the statistic's real-time status, allowing for a more nuanced understanding of the statistical metrics at play.
 
-### Statistic Definitions
+### Defining Statistics
 
-It is possible to initialize the statistical values in several ways, but we'll go through the fundamental ways. Let us create some statistical values for a character.
-```js
-// We can by creating a basic statistical template by defining some stats with values for a character.
+Creating and initializing statistical values for your entities is the cornerstone of your character development process. Let's walk through the essentials of defining statistics for a character using the `/stat` library.
+```dm
+// Create a fundamental statistical framework for a character by establishing basic stats with associated values.
 var
     stat
-        size = new ("Size", 5) // The size of the character, value `5`.
-        strength = new ("Strength", 3) // The strength of the character, value `3`.
-        stamina = new ("Stamina", 2) // The stamina of the character, value `2`.
-        finesse = new ("Finesse", 1) // The finesse of the character, value `1`.
+        // Define the 'size' statistic for the character with an initial value of `5`.
+        size = new ("Size", 5) 
+        
+        // Define the 'strength' statistic, signifying the physical power of the character, with an initial value of `3`.
+        strength = new ("Strength", 3)
+        
+        // Define the 'stamina' statistic, representing the endurance of the character, initialized with a value of `2`.
+        stamina = new ("Stamina", 2)
+        
+        // Define the 'finesse' statistic, indicative of the character's skill and precision, with a starting value of `1`.
+        finesse = new ("Finesse", 1)
+
 ```
 
-Now that we have defined the basic statistics for the characters we notice that some are missing, such as speed or defense, let us go ahead and create some of those as well.
-```js
-// We'll define speed and defense as empty statistics.
+### Extending Character Statistics
+
+As your character model evolves, you may find the need to introduce additional statistics to better represent your characters' attributes. For instance, you may want to add attributes such as 'speed' and 'defense'. Let's see how to integrate these new statistics using the `/stat` library.
+```dm
+// Define 'speed' and 'defense' as new statistics without initial values.
 var
     stat
-        speed = new ("Speed") // The speed of the character, without value - defaults to `0`.
-        defense = new ("Defense") // The defense of the character, without value - defaults to `0`.
+        // Define the 'speed' statistic for the character, which is initially unset - defaults to `0`.
+        speed = new ("Speed") 
+        
+        // Similarly, define the 'defense' statistic, representing the character's defensive capabilities, which is also unset initially - defaults to `0`.
+        defense = new ("Defense") 
 ```
+In this example, we've added two new statistics to our character model, 'speed' and 'defense'. These are initially set to `0`, but can be updated as needed based on your character's progression.
 
 ### Statistic Relationships: Binding and Unbinding
 
 After defining your statistics, you can create relationships between them. This process, also known as binding, links different stats together, enabling more complex calculations.
-```js
+```dm
 // By using the `&=` operator, you can bind multiple statistics (such as size, strength, and finesse) to another statistic (like speed).
 // The result will be a speed value that is the sum of all the bound statistics.
 speed &= list(size, strength, finesse)
 ```
 
 You can also define these relationships individually, not in a list. However, each time a binding operation occurs, the statistic value updates, potentially causing inefficiencies. To bypass this, use the `/stat/var/pause_update` variable and set it to `TRUE`. After binding all desired statistics, re-enable updates and call the `Update()` function.
-```js
+```dm
 // Updates everytime a relationship is bound
 speed &= size
 speed &= strength
@@ -130,7 +145,7 @@ speed.Update() // Manual update
 ```
 
 There might be occasions where you want to dissolve these relationships. To unbind statistics, use the `|=` operator. This operation mirrors the process of building relationships.
-```js
+```dm
 // For instance, you can remove strength from the relationship with speed.
 speed |= strength
 ```
@@ -138,7 +153,7 @@ speed |= strength
 ### Modes of Operation
 
 At times, you might want to manipulate your statistics in more specific ways. For instance, consider a `defense` variable that needs to represent the weakest attribute of a character. In such cases, we can employ modes to customize statistic behavior.
-```js
+```dm
 // To create a defense statistic that reflects the lowest of certain other stats, use the `STAT_MIN` mode.
 // Once the mode is set, bind the desired stats (e.g., stamina, finesse) to 'defense'.
 defense.mode = defense.STAT_MIN // Now, 'defense' will always reflect the lowest value among its bound stats.
@@ -148,7 +163,7 @@ defense &= list(stamina, finesse)
 ### Vital Statistics
 
 For some attributes, like `health`, which requires tracking of both the current status and maximum value, we can employ `/stat/vital` instead of the basic `/stat`.
-```js
+```dm
 // We will initialize the health statistic as a vital and bind it to be the sum of size and stamina.
 var
     stat/vital
@@ -159,7 +174,7 @@ health &= list(size, stamina)
 ### Reading Statistics
 
 Once your statistics are defined and bound as desired, you can easily access their values for game logic, display purposes, or debugging.
-```js
+```dm
 // The 'value' variable provides the computed value of any given statistic.
 src << health.value
 
@@ -172,7 +187,7 @@ src << health.current
 This library is designed to facilitate arithmetic operations with statistics, much like you'd handle regular numeric values. To prevent potential issues, it's recommended that the statistic value is placed on the left side of the operation, or directly refer to the `value` variable of the statistic.
 
 In the following example, we perform a subtraction operation between two statistics, `attack` and `defense`. The result of this operation can then be used in further game mechanics, such as calculating `damage`.
-```js
+```dm
 var
     stat
         attack = new ("Attack", 10)
@@ -187,12 +202,12 @@ This library supports the overloading of various operators to streamline the use
 
 ### `operator""()`
 This operator returns a string representation of the statistic. It outputs the name of the statistic followed by its value.
-```js
+```dm
 src << stat // Outputs "[name]: [value]"
 ```
 ### `operator+=(stat/s)`
 This operator adds a value `s` to the statistic `base` value. It can accept a numeric value, another statistic, a list of statistics, or a text string.
-```js
+```dm
 stat += 5 // Add number to base
 stat += other_stat // Add value of other_stat to base
 stat += list(stat1, stat2) // Add values of stat1 and stat2 to base
@@ -200,7 +215,7 @@ stat += "New Name" // Change name or desc of the stat
 ```
 ### `operator-=(stat/s)`
 This operator behaves similarly to `operator+=(stat/s)`, but subtracts `s` from `base`.
-```js
+```dm
 stat -= 5 // Subtract number from base
 stat -= other_stat // Subtract value of other_stat from base
 stat -= list(stat1, stat2) // Subtract values of stat1 and stat2 from base
@@ -208,33 +223,33 @@ stat -= "New Name" // Reset name or desc of the stat to its initial value
 ```
 ### `operator*=(stat/s)`, `operator/=(stat/s)`
 These operators behave like the addition and subtraction operators, but instead perform multiplication and division, respectively.
-```js
+```dm
 stat *= 2 // Multiply base by number
 stat /= other_stat // Divide base by value of other_stat
 stat *= list(stat1, stat2) // Multiply base by values of stat1 and stat2
 ```
 ### `operator&=(stat/s)`
 This operator binds `s` to the statistic. If `s` is a number, it sets base to `s`. If `s` is a statistic, it adds `s` to the contents of the statistic. If `s` is a list, it binds each statistic in `s` to the statistic.
-```js
+```dm
 stat &= 5 // Bind number to base
 stat &= other_stat // Bind other_stat to stat
 stat &= list(stat1, stat2) // Bind stat1 and stat2 to stat
 ```
 ### `operator|=(stat/s)`
 This operator unbinds `s` from the statistic. If `s` is a statistic, it removes `s` from contents of the statistic. If `s` is a list, it unbinds each statistic in `s` from the statistic.
-```js
+```dm
 stat |= other_stat // Unbind other_stat from stat
 stat |= list(stat1, stat2) // Unbind stat1 and stat2 from stat
 ```
 ### `operator%=(stat/s)`
 This operator changes the `multiplier` of the statistic to `s`. It can accept another statistic or a number.
-```js
+```dm
 stat %= other_stat // Set multiplier of stat to the value of other_stat
 stat %= 2 // Set multiplier of stat to 2
 ```
 ### `operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`
 These operators perform the corresponding arithmetic operation between the value of the statistic and `s`. If `s` is a statistic, the operation is performed with the value of `s`. If `s` is a number, the operation is performed with `s`.
-```js
+```dm
 var/result = stat + 5 // Add number to value of stat
 result = stat - other_stat // Subtract value of other_stat from value of stat
 result = stat / 2 // Divide value of stat by number
@@ -251,7 +266,7 @@ Event handling is a critical aspect of the `/stat` library. It integrates seamle
 
 ### Subscribing to Events
 You can subscribe to these events using the `/stat/proc/On()` function. This function allows you to specify the event, the datum (object), the callback function, and any additional arguments you might need.
-```js
+```dm
 /*
 event: The event to subscribe to as a string.
 datum: The object in context, any `/datum` instance.
@@ -264,13 +279,13 @@ stat.On(event, datum, callback, callback_args, strict)
 
 ### Unsubscribing from Events
 The process to unsubscribe from an event is similar to subscription. It searches for the event and callbacks that match the parameters you defined and removes them accordingly.
-```js
+```dm
 stat.Off(event, datum, callback, callback_args, strict)
 ```
 
 ### Example Usage
 Below is an example of defining a callback function, subscribing to a statistic, and modifying the statistic to trigger the event.
-```js
+```dm
 // Define callback functions:
 // static = FALSE
 proc/change_static_false(event, stat/s, old_value, a, b, c)
@@ -295,7 +310,7 @@ In many scenarios, it's essential to impose limitations on statistics, whether d
 
 ### Setting Static Limits
 In this scenario, we're establishing fixed bounds for our statistic. The statistic, named 'Strength', is created with an initial value of 4. We then set the lower and upper bounds for the base value to 1 and 5, respectively. This means the base value can't go lower than 1 or higher than 5. We also set the overall value limit within the range of 0 to 10, allowing for additional boosts or modifications to alter the statistic within this specified range.
-```js
+```dm
 // Create a statistic named 'Strength' with a value of 4 and set base and value limitations.
 var/stat/strength = new ("Strength", 4)
 strength.base_limit = new (1, 5) // The base value will always be between 1 and 5.
@@ -304,7 +319,7 @@ strength.value_limit = new (0, 10) // With boosts or other modifications, the va
 
 ### Setting Dynamic Limits
 Dynamic limits allow for more flexibility, with the ability to use another statistic as either the lower or upper limit. The setup largely resembles the static definition, but we'll use a different statistic as the upper limit in this example. Here, 'Upper Limit' is defined as a statistic with a value of 5, which is then used as the upper limit for the 'Strength' statistic's base value.
-```js
+```dm
 // Define 'Upper Limit' as a statistic and use it as the upper limit for 'Strength'.
 var
     stat
@@ -321,7 +336,7 @@ To facilitate the automatic recovery of the current value in a `/stat/vital` obj
 A suitable place to implement this updater is within the `world/Tick()` procedure, which runs every game tick. This ensures that the `stat_vital_recovery_tick()` function executes routinely, allowing the current value of all vital stats to recover over time.
 
 Here's how you can integrate it:
-```js
+```dm
 // A good option to place the updater is to make it run every tick in the `world/Tick()` proc.
 world
     Tick()
