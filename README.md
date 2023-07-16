@@ -36,6 +36,7 @@ The `/stat` library offers a powerful and versatile solution for handling charac
   - [Setting Static Limits](#setting-static-limits)
   - [Setting Dynamic Limits](#setting-dynamic-limits)
 - [Tick and Vital Stat Recovery](#tick-and-vital-stat-recovery)
+- [License](#license)
 
 
 # Installation
@@ -363,3 +364,7 @@ world
         stat_vital_recovery_tick()
 ```
 This configuration promotes regular updates of current values in `/stat/vital` objects, facilitating their recovery per each game tick.
+
+# License
+
+For more details on our license, please see the [LICENSE](./LICENSE.md) file.
