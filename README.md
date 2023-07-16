@@ -18,24 +18,24 @@ The `/stat` library offers a powerful and versatile solution for handling charac
     - [Vital Statistics](#vital-statistics)
     - [Reading Statistics](#reading-statistics)
     - [Arithmetic Operations with Statistics](#arithmetic-operations-with-statistics)
-  - [Stat Modes of Operation](#stat-modes-of-operation)
-  - [Operators](#operators)
-    - [`operator""()`](#operator)
-    - [`operator+=(stat/s)`](#operatorstats)
-    - [`operator-=(stat/s)`](#operator-stats)
-    - [`operator*=(stat/s)`, `operator/=(stat/s)`](#operatorstats-operatorstats)
-    - [`operator&=(stat/s)`](#operatorstats-1)
-    - [`operator|=(stat/s)`](#operatorstats-2)
-    - [`operator%=(stat/s)`](#operatorstats-3)
-    - [`operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`](#operatorstats-operator-stats-operatorstats-operatorstats-operatorstats)
-  - [Event Handling](#event-handling)
-    - [Subscribing to Events](#subscribing-to-events)
-    - [Unsubscribing from Events](#unsubscribing-from-events)
-    - [Example Usage](#example-usage)
-  - [Applying Limits to Statistics](#applying-limits-to-statistics)
-    - [Setting Static Limits](#setting-static-limits)
-    - [Setting Dynamic Limits](#setting-dynamic-limits)
-  - [Tick and Vital Stat Recovery](#tick-and-vital-stat-recovery)
+- [Stat Modes of Operation](#stat-modes-of-operation)
+- [Operators](#operators)
+  - [`operator""()`](#operator)
+  - [`operator+=(stat/s)`](#operatorstats)
+  - [`operator-=(stat/s)`](#operator-stats)
+  - [`operator*=(stat/s)`, `operator/=(stat/s)`](#operatorstats-operatorstats)
+  - [`operator&=(stat/s)`](#operatorstats-1)
+  - [`operator|=(stat/s)`](#operatorstats-2)
+  - [`operator%=(stat/s)`](#operatorstats-3)
+  - [`operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`](#operatorstats-operator-stats-operatorstats-operatorstats-operatorstats)
+- [Event Handling](#event-handling)
+  - [Subscribing to Events](#subscribing-to-events)
+  - [Unsubscribing from Events](#unsubscribing-from-events)
+  - [Example Usage](#example-usage)
+- [Applying Limits to Statistics](#applying-limits-to-statistics)
+  - [Setting Static Limits](#setting-static-limits)
+  - [Setting Dynamic Limits](#setting-dynamic-limits)
+- [Tick and Vital Stat Recovery](#tick-and-vital-stat-recovery)
 
 
 # Installation
@@ -196,7 +196,7 @@ var
     damage = attack - defense // Returns the value `5`
 ```
 
-## Stat Modes of Operation
+# Stat Modes of Operation
 
 The `/stat` library provides various operational modes that determine how statistics calculations are processed. These modes can be configured using the `mode` parameter and they dictate how the `Update()` function treats a given statistic's value.
 
@@ -215,16 +215,16 @@ The function also handles the case when a multiplier is applied to the base valu
 
 Lastly, if any changes to the statistic are detected, the function triggers the necessary events and forces all statistics linked to the current one to update.
 
-## Operators
+# Operators
 
 This library supports the overloading of various operators to streamline the use of statistical values in your code. Here are the definitions and uses for these overloaded operators:
 
-### `operator""()`
+## `operator""()`
 This operator returns a string representation of the statistic. It outputs the name of the statistic followed by its value.
 ```dm
 src << stat // Outputs "[name]: [value]"
 ```
-### `operator+=(stat/s)`
+## `operator+=(stat/s)`
 This operator adds a value `s` to the statistic `base` value. It can accept a numeric value, another statistic, a list of statistics, or a text string.
 ```dm
 stat += 5 // Add number to base
@@ -232,7 +232,7 @@ stat += other_stat // Add value of other_stat to base
 stat += list(stat1, stat2) // Add values of stat1 and stat2 to base
 stat += "New Name" // Change name or desc of the stat
 ```
-### `operator-=(stat/s)`
+## `operator-=(stat/s)`
 This operator behaves similarly to `operator+=(stat/s)`, but subtracts `s` from `base`.
 ```dm
 stat -= 5 // Subtract number from base
@@ -240,33 +240,33 @@ stat -= other_stat // Subtract value of other_stat from base
 stat -= list(stat1, stat2) // Subtract values of stat1 and stat2 from base
 stat -= "New Name" // Reset name or desc of the stat to its initial value
 ```
-### `operator*=(stat/s)`, `operator/=(stat/s)`
+## `operator*=(stat/s)`, `operator/=(stat/s)`
 These operators behave like the addition and subtraction operators, but instead perform multiplication and division, respectively.
 ```dm
 stat *= 2 // Multiply base by number
 stat /= other_stat // Divide base by value of other_stat
 stat *= list(stat1, stat2) // Multiply base by values of stat1 and stat2
 ```
-### `operator&=(stat/s)`
+## `operator&=(stat/s)`
 This operator binds `s` to the statistic. If `s` is a number, it sets base to `s`. If `s` is a statistic, it adds `s` to the contents of the statistic. If `s` is a list, it binds each statistic in `s` to the statistic.
 ```dm
 stat &= 5 // Bind number to base
 stat &= other_stat // Bind other_stat to stat
 stat &= list(stat1, stat2) // Bind stat1 and stat2 to stat
 ```
-### `operator|=(stat/s)`
+## `operator|=(stat/s)`
 This operator unbinds `s` from the statistic. If `s` is a statistic, it removes `s` from contents of the statistic. If `s` is a list, it unbinds each statistic in `s` from the statistic.
 ```dm
 stat |= other_stat // Unbind other_stat from stat
 stat |= list(stat1, stat2) // Unbind stat1 and stat2 from stat
 ```
-### `operator%=(stat/s)`
+## `operator%=(stat/s)`
 This operator changes the `multiplier` of the statistic to `s`. It can accept another statistic or a number.
 ```dm
 stat %= other_stat // Set multiplier of stat to the value of other_stat
 stat %= 2 // Set multiplier of stat to 2
 ```
-### `operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`
+## `operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`
 These operators perform the corresponding arithmetic operation between the value of the statistic and `s`. If `s` is a statistic, the operation is performed with the value of `s`. If `s` is a number, the operation is performed with `s`.
 ```dm
 var/result = stat + 5 // Add number to value of stat
@@ -275,7 +275,7 @@ result = stat / 2 // Divide value of stat by number
 result = stat ** other_stat // Raise value of stat to the power of the value of other_stat
 ```
 
-## Event Handling
+# Event Handling
 
 Event handling is a critical aspect of the `/stat` library. It integrates seamlessly with your current or future ecosystem by providing hooks to specific state changes or updates in your statistics. Here are some of the events you can subscribe to:
 
@@ -283,7 +283,7 @@ Event handling is a critical aspect of the `/stat` library. It integrates seamle
 - `change`: Activated when the `value` of the statistic changes.
 - `change:current`: Fired when the `current` value of a statistic changes.
 
-### Subscribing to Events
+## Subscribing to Events
 You can subscribe to these events using the `/stat/proc/On()` function. This function allows you to specify the event, the datum (object), the callback function, and any additional arguments you might need.
 ```dm
 /*
@@ -296,13 +296,13 @@ strict: Boolean flag (default is FALSE). When set to TRUE, it provides the callb
 stat.On(event, datum, callback, callback_args, strict)
 ```
 
-### Unsubscribing from Events
+## Unsubscribing from Events
 The process to unsubscribe from an event is similar to subscription. It searches for the event and callbacks that match the parameters you defined and removes them accordingly.
 ```dm
 stat.Off(event, datum, callback, callback_args, strict)
 ```
 
-### Example Usage
+## Example Usage
 Below is an example of defining a callback function, subscribing to a statistic, and modifying the statistic to trigger the event.
 ```dm
 // Define callback functions:
@@ -323,11 +323,11 @@ stat += 1
 ```
 This example demonstrates how you can leverage events to keep track of changes in your statistics and execute specific actions in response.
 
-## Applying Limits to Statistics
+# Applying Limits to Statistics
 
 In many scenarios, it's essential to impose limitations on statistics, whether due to natural constraints or designed restrictions. The `/stat/limit` feature provides the capability to set limits on `base`, `value`, and `current` variables through `base_limit`, `value_limit`, and `current_limit` respectively. This section explains how to implement these limitations.
 
-### Setting Static Limits
+## Setting Static Limits
 In this scenario, we're establishing fixed bounds for our statistic. The statistic, named 'Strength', is created with an initial value of 4. We then set the lower and upper bounds for the base value to 1 and 5, respectively. This means the base value can't go lower than 1 or higher than 5. We also set the overall value limit within the range of 0 to 10, allowing for additional boosts or modifications to alter the statistic within this specified range.
 ```dm
 // Create a statistic named 'Strength' with a value of 4 and set base and value limitations.
@@ -336,7 +336,7 @@ strength.base_limit = new (1, 5) // The base value will always be between 1 and 
 strength.value_limit = new (0, 10) // With boosts or other modifications, the value can range from 0 to 10.
 ```
 
-### Setting Dynamic Limits
+## Setting Dynamic Limits
 Dynamic limits allow for more flexibility, with the ability to use another statistic as either the lower or upper limit. The setup largely resembles the static definition, but we'll use a different statistic as the upper limit in this example. Here, 'Upper Limit' is defined as a statistic with a value of 5, which is then used as the upper limit for the 'Strength' statistic's base value.
 ```dm
 // Define 'Upper Limit' as a statistic and use it as the upper limit for 'Strength'.
@@ -348,7 +348,7 @@ strength.base_limit = new (1, upper_limit) // Set the 'Upper Limit' statistic as
 strength.value_limit = new (0, 10) // The value of 'Strength' can range from 0 to 10.
 ```
 
-## Tick and Vital Stat Recovery
+# Tick and Vital Stat Recovery
 
 To facilitate the automatic recovery of the current value in a `/stat/vital` object, the `/stat/vital/proc/Recovery()` function must be tied into a global updater. This updater function, `stat_vital_recovery_tick()`, should be placed within a running environment where it can consistently trigger at a specified rate.
 
