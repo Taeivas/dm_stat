@@ -1,88 +1,100 @@
+/*
+ * Represents a vital statistic.
+ *
+ * The `New()` method initializes a new vital statistic object.
+ * If the `recovery_rate` is set, the vital statistic is added to the `stat_vital_recovery` global variable.
+ *
+ * Properties:
+ * - `current`: Current value of the vital statistic.
+ * - `stat/limit/current_limit`: Limit of the current value. Automatically adjusted if set.
+ * - `auto_adjust`: Flag indicating whether the `current` value should be automatically adjusted.
+ * - `recovery_delay`: Time delay for recovery.
+ * - `tmp`: Temporary variable.
+ * - `stat/recovery_rate`: Recovery rate of the vital statistic.
+ *
+ * Methods:
+ * - `Update()`: Updates the vital statistic value. If the value changes and `auto_adjust` is enabled, adjusts the `src` accordingly.
+ *   If the `recovery_rate` is set, adds the vital statistic to the `stat_vital_recovery` global variable.
+ * - `Recovery()`: Initiates the recovery process for the vital statistic.
+ * - `operator""()`: Returns a string representation of the vital statistic.
+ * - `operator<<=(stat/s)`: Decreases the current value by `s`. Handles different types of `s`.
+ * - `operator>>=(stat/s)`: Increases the current value by `s`. Handles different types of `s`.
+ */
 stat
 	vital
 		New()
 			. = ..()
-			UpdateVital(current)
+			if(recovery_rate)
+				::stat_vital_recovery |= src
 		var
-			tmp
-				pause_vital = FALSE
-				recovery = FALSE
-			auto_adjust = TRUE
 			current = 0
+			stat/limit/current_limit
+			auto_adjust = TRUE
+
+			recovery_delay = 10
+			tmp
+				recovery_next
 			stat
 				recovery_rate = 1
-				current_min
-				current_max
-			recovery_delay = 10
 		Update()
 			. = value
 			..()
 			if(. != value && auto_adjust)
 				src >>= value - .
-
+			else
+				if(recovery_rate)
+					::stat_vital_recovery |= src
 		operator""()
-			. = "[name]: [current]/[value]"
-			if(desc != null)
-				. += "\n\t[desc]"
+			return "[name]: [current]/[value]"
 		proc
 			Recovery()
-				set waitfor = FALSE
-				if(recovery)
-					return FALSE
-				recovery = TRUE
-				while(recovery && current < value)
-					sleep(recovery_delay)
-					src >>= min(recovery_rate, value - recovery_rate)
+				if(recovery_next == null)
+					recovery_next = world.time + recovery_delay
+				else if(recovery_next <= world.time)
+					src >>= min(value - current, isnum(recovery_rate) ? recovery_rate : recovery_rate.value)
+					recovery_next = world.time + recovery_delay
 					if(current >= value)
-						break
-				recovery = FALSE
-			UpdateVital(old_current)
-				if(pause_vital)
-					return FALSE
+						recovery_next = null
+						::stat_vital_recovery -= src
+			operator<<=(stat/s)
+				. = current
+				if(isnum(s))
+					current -= s
+				else if(istype(s, /stat))
+					current -= s.value
+				else if(islist(s))
+					pause_update = TRUE
+					for(var/a in s)
+						src <<= a
+					pause_update = FALSE
+				if(current_limit)
+					current = current_limit.Clamp(current)
+				if(pause_update)
 				else
-					if(old_current != current)
-						if(locs && locs.len)
-							for(var/atom/a in locs)
-								a.OnUpdateVital(src, old_current, current)
-						Recovery()
-					return TRUE
-			LimitVital(current)
-				if(current_min != null)
-					if(isnum(current_min))
-						current = max(current_min, current)
-					else if(istype(current_min, /stat))
-						current = max(current_min:value, current)
-				if(current_max != null)
-					if(isnum(current_max))
-						current = min(current_max, current)
-					else if(istype(current_max, /stat))
-						current = min(current_max:value, current)
-				return current
-			operator<<=(x)
+					if(. != current)
+						if(events && events["change:current"])
+							for(var/stat/event/e in events["change:current"])
+								e.Call("change:current", src, .)
+					if(current < value && recovery_rate)
+						::stat_vital_recovery |= src
+			operator>>=(stat/s)
 				. = current
-				if(isnum(x))
-					current -= x
-					current = LimitVital(current)
-				else if(islist(x))
-					pause_vital = TRUE
-					for(var/v in x)
-						src <<= v
-					pause_vital = FALSE
-				else if(istype(x, /stat))
-					src <<= x:value
-				if(current != .)
-					UpdateVital(.)
-			operator>>=(x)
-				. = current
-				if(isnum(x))
-					current += x
-					current = LimitVital(current)
-				else if(islist(x))
-					pause_vital = TRUE
-					for(var/v in x)
-						src >>= v
-					pause_vital = FALSE
-				else if(istype(x, /stat))
-					src >>= x:value
-				if(current != .)
-					UpdateVital(.)
+				if(isnum(s))
+					current += s
+				else if(istype(s, /stat))
+					current += s.value
+				else if(islist(s))
+					pause_update = TRUE
+					for(var/a in s)
+						src >>= a
+					pause_update = FALSE
+				if(current_limit)
+					current = current_limit.Clamp(current)
+				if(pause_update)
+				else
+					if(. != current)
+						if(events && events["change:current"])
+							for(var/stat/event/e in events["change:current"])
+								e.Call("change:current", src, .)
+					if(current < value && recovery_rate)
+						::stat_vital_recovery |= src

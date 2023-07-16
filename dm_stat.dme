@@ -13,7 +13,10 @@
 // END_PREFERENCES
 
 // BEGIN_INCLUDE
-#include "scripts\stat\atom.dm"
+#include "demo.dm"
+#include "scripts\stat\event.dm"
+#include "scripts\stat\limit.dm"
+#include "scripts\stat\proc.dm"
 #include "scripts\stat\stat.dm"
 #include "scripts\stat\vital.dm"
 // END_INCLUDE
