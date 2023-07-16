@@ -1,6 +1,6 @@
 # BYOND Dream Maker `/stat` Library
 
-The /stat library offers a powerful and versatile solution for handling character statistics in your games or simulations. It simplifies the creation and manipulation of statistics like strength, speed, health, and more. It provides robust arithmetic operations, flexible binding/unbinding of statistics, customizable modes for different stats, easy reading of values, and extensibility through operator overloading. Whether you're creating an RPG, strategy game, or a complex simulation, the /stat library is the tool you need to manage your character stats effectively and efficiently.
+The `/stat` library offers a powerful and versatile solution for handling character statistics in your games or simulations. It simplifies the creation and manipulation of statistics like strength, speed, health, and more. It provides robust arithmetic operations, flexible binding/unbinding of statistics, customizable modes for different stats, easy reading of values, and extensibility through operator overloading. Whether you're creating an RPG, strategy game, or a complex simulation, the `/stat `library is the tool you need to manage your character stats effectively and efficiently.
 
 - [BYOND Dream Maker `/stat` Library](#byond-dream-maker-stat-library)
 - [Installation](#installation)
