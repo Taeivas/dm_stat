@@ -18,7 +18,7 @@ The `/stat` library offers a powerful and versatile solution for handling charac
     - [Vital Statistics](#vital-statistics)
     - [Reading Statistics](#reading-statistics)
     - [Arithmetic Operations with Statistics](#arithmetic-operations-with-statistics)
-- [Stat Modes of Operation](#stat-modes-of-operation)
+- [Stat Modes](#stat-modes)
 - [Operators](#operators)
   - [`operator""()`](#operator)
   - [`operator+=(stat/s)`](#operatorstats)
@@ -196,7 +196,7 @@ var
     damage = attack - defense // Returns the value `5`
 ```
 
-# Stat Modes of Operation
+# Stat Modes
 
 The `/stat` library provides various operational modes that determine how statistics calculations are processed. These modes can be configured using the `mode` parameter and they dictate how the `Update()` function treats a given statistic's value.
 
