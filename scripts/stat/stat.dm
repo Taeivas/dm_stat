@@ -120,9 +120,17 @@ stat
 				value = call(mode_proc)(value)
 
 			if(mode & STAT_FLOOR)
+				#if DM_VERSION < 515
+				value = round(value)
+				#else
 				value = floor(value)
+				#endif
 			else if(mode & STAT_CEIL)
+				#if DM_VERSION < 515
+				value = -round(-value)
+				#else
 				value = ceil(value)
+				#endif
 			else if(mode & STAT_ROUND)
 				value = round(value, mode_round_digit)
 
@@ -161,8 +169,13 @@ stat
 							events[event] -= e
 					if(!events[event].len)
 						events -= event
+		#if DM_VERSION < 515
+		Stringify()
+			return "[name]: [value]"
+		#else
 		operator""()
 			return "[name]: [value]"
+		#endif
 		operator+=(stat/s)
 			if(isnum(s))
 				base += s

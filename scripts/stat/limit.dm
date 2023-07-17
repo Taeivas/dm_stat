@@ -20,8 +20,13 @@ stat
 				min
 				max
 		proc
+			#if DM_VERSION < 515
+			Stringify()
+				return "/stat/limit([min], [max])"
+			#else
 			operator""()
 				return "/stat/limit([min], [max])"
+			#endif
 			Clamp(value)
 				if(min != null && max != null)
 					return clamp(value, isnum(min) ? min : min.value, isnum(max) ? max : max.value)

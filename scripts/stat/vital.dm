@@ -25,7 +25,11 @@ stat
 		New()
 			. = ..()
 			if(recovery_rate)
+				#if DM_VERSION < 515
+				global.stat_vital_recovery |= src
+				#else
 				::stat_vital_recovery |= src
+				#endif
 		var
 			current = 0
 			stat/limit/current_limit
@@ -43,9 +47,18 @@ stat
 				src >>= value - .
 			else
 				if(recovery_rate)
+					#if DM_VERSION < 515
+					global.stat_vital_recovery |= src
+					#else
 					::stat_vital_recovery |= src
+					#endif
+		#if DM_VERSION < 515
+		Stringify()
+			return "[name]: [current]/[value]"
+		#else
 		operator""()
 			return "[name]: [current]/[value]"
+		#endif
 		proc
 			Recovery()
 				if(recovery_next == null)
@@ -55,7 +68,11 @@ stat
 					recovery_next = world.time + recovery_delay
 					if(current >= value)
 						recovery_next = null
+						#if DM_VERSION < 515
+						global.stat_vital_recovery -= src
+						#else
 						::stat_vital_recovery -= src
+						#endif
 			operator<<=(stat/s)
 				. = current
 				if(isnum(s))
@@ -76,7 +93,11 @@ stat
 							for(var/stat/event/e in events["change:current"])
 								e.Call("change:current", src, .)
 					if(current < value && recovery_rate)
+						#if DM_VERSION < 515
+						global.stat_vital_recovery |= src
+						#else
 						::stat_vital_recovery |= src
+						#endif
 			operator>>=(stat/s)
 				. = current
 				if(isnum(s))
@@ -97,4 +118,8 @@ stat
 							for(var/stat/event/e in events["change:current"])
 								e.Call("change:current", src, .)
 					if(current < value && recovery_rate)
+						#if DM_VERSION < 515
+						global.stat_vital_recovery |= src
+						#else
 						::stat_vital_recovery |= src
+						#endif

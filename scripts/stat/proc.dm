@@ -9,6 +9,13 @@
 */
 var/stat_vital_recovery[] = new
 proc/stat_vital_recovery_tick()
+	#if DM_VERSION < 515
+	if(global.stat_vital_recovery.len)
+		for(var/stat/vital/v in global.stat_vital_recovery)
+			v.Recovery()
+	#endif
+	#if DM_VERSION >= 515
 	if(::stat_vital_recovery.len)
 		for(var/stat/vital/v in ::stat_vital_recovery)
 			v.Recovery()
+	#endif
