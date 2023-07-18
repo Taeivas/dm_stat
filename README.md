@@ -16,18 +16,23 @@ The `/stat` library offers a powerful and versatile solution for handling charac
     - [Statistic Relationships: Binding and Unbinding](#statistic-relationships-binding-and-unbinding)
     - [Modes of Operation](#modes-of-operation)
     - [Vital Statistics](#vital-statistics)
+    - [Incrementing and Decrementing Current Values](#incrementing-and-decrementing-current-values)
     - [Reading Statistics](#reading-statistics)
     - [Arithmetic Operations with Statistics](#arithmetic-operations-with-statistics)
 - [Stat Modes](#stat-modes)
 - [Operators](#operators)
-  - [`operator""()`](#operator)
-  - [`operator+=(stat/s)`](#operatorstats)
-  - [`operator-=(stat/s)`](#operator-stats)
-  - [`operator*=(stat/s)`, `operator/=(stat/s)`](#operatorstats-operatorstats)
-  - [`operator&=(stat/s)`](#operatorstats-1)
-  - [`operator|=(stat/s)`](#operatorstats-2)
-  - [`operator%=(stat/s)`](#operatorstats-3)
-  - [`operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`](#operatorstats-operator-stats-operatorstats-operatorstats-operatorstats)
+  - [`/stat`](#stat)
+    - [`operator""()`](#operator)
+    - [`operator+=(stat/s)`](#operatorstats)
+    - [`operator-=(stat/s)`](#operator-stats)
+    - [`operator*=(stat/s)`, `operator/=(stat/s)`](#operatorstats-operatorstats)
+    - [`operator&=(stat/s)`](#operatorstats-1)
+    - [`operator|=(stat/s)`](#operatorstats-2)
+    - [`operator%=(stat/s)`](#operatorstats-3)
+    - [`operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`](#operatorstats-operator-stats-operatorstats-operatorstats-operatorstats)
+  - [`/stat/vital`](#statvital)
+    - [`operator<<=(stat/s)`](#operatorstats-4)
+    - [`operator>>=(stat/s)`](#operatorstats-5)
 - [Event Handling](#event-handling)
   - [Subscribing to Events](#subscribing-to-events)
   - [Unsubscribing from Events](#unsubscribing-from-events)
@@ -173,6 +178,17 @@ var
 health &= list(size, stamina)
 ```
 
+### Incrementing and Decrementing Current Values
+
+The `/stat/vital` class provides unique operators to increment or decrement the `current` value of a statistic, making it easy to modify character vitals like health, mana, or energy. The operators `<<=` and `>>=` are employed for this purpose. Here's how they work:
+```dm
+// Decrements the current health value by 5. If the current health value was 20, it will be reduced to 15.
+health <<= 5 
+
+// Increments the current health value by 10. If the current health value was 15, it will increase to 25.
+health >>= 10
+```
+
 ### Reading Statistics
 
 Once your statistics are defined and bound as desired, you can easily access their values for game logic, display purposes, or debugging.
@@ -220,12 +236,14 @@ Lastly, if any changes to the statistic are detected, the function triggers the 
 
 This library supports the overloading of various operators to streamline the use of statistical values in your code. Here are the definitions and uses for these overloaded operators:
 
-## `operator""()`
+## `/stat`
+
+### `operator""()`
 This operator returns a string representation of the statistic. It outputs the name of the statistic followed by its value.
 ```dm
 src << stat // Outputs "[name]: [value]"
 ```
-## `operator+=(stat/s)`
+### `operator+=(stat/s)`
 This operator adds a value `s` to the statistic `base` value. It can accept a numeric value, another statistic, a list of statistics, or a text string.
 ```dm
 stat += 5 // Add number to base
@@ -233,7 +251,7 @@ stat += other_stat // Add value of other_stat to base
 stat += list(stat1, stat2) // Add values of stat1 and stat2 to base
 stat += "New Name" // Change name or desc of the stat
 ```
-## `operator-=(stat/s)`
+### `operator-=(stat/s)`
 This operator behaves similarly to `operator+=(stat/s)`, but subtracts `s` from `base`.
 ```dm
 stat -= 5 // Subtract number from base
@@ -241,33 +259,33 @@ stat -= other_stat // Subtract value of other_stat from base
 stat -= list(stat1, stat2) // Subtract values of stat1 and stat2 from base
 stat -= "New Name" // Reset name or desc of the stat to its initial value
 ```
-## `operator*=(stat/s)`, `operator/=(stat/s)`
+### `operator*=(stat/s)`, `operator/=(stat/s)`
 These operators behave like the addition and subtraction operators, but instead perform multiplication and division, respectively.
 ```dm
 stat *= 2 // Multiply base by number
 stat /= other_stat // Divide base by value of other_stat
 stat *= list(stat1, stat2) // Multiply base by values of stat1 and stat2
 ```
-## `operator&=(stat/s)`
+### `operator&=(stat/s)`
 This operator binds `s` to the statistic. If `s` is a number, it sets base to `s`. If `s` is a statistic, it adds `s` to the contents of the statistic. If `s` is a list, it binds each statistic in `s` to the statistic.
 ```dm
 stat &= 5 // Bind number to base
 stat &= other_stat // Bind other_stat to stat
 stat &= list(stat1, stat2) // Bind stat1 and stat2 to stat
 ```
-## `operator|=(stat/s)`
+### `operator|=(stat/s)`
 This operator unbinds `s` from the statistic. If `s` is a statistic, it removes `s` from contents of the statistic. If `s` is a list, it unbinds each statistic in `s` from the statistic.
 ```dm
 stat |= other_stat // Unbind other_stat from stat
 stat |= list(stat1, stat2) // Unbind stat1 and stat2 from stat
 ```
-## `operator%=(stat/s)`
+### `operator%=(stat/s)`
 This operator changes the `multiplier` of the statistic to `s`. It can accept another statistic or a number.
 ```dm
 stat %= other_stat // Set multiplier of stat to the value of other_stat
 stat %= 2 // Set multiplier of stat to 2
 ```
-## `operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`
+### `operator+(stat/s)`, `operator-(stat/s)`, `operator*(stat/s)`, `operator/(stat/s)`, `operator**(stat/s)`
 These operators perform the corresponding arithmetic operation between the value of the statistic and `s`. If `s` is a statistic, the operation is performed with the value of `s`. If `s` is a number, the operation is performed with `s`.
 ```dm
 var/result = stat + 5 // Add number to value of stat
@@ -275,6 +293,25 @@ result = stat - other_stat // Subtract value of other_stat from value of stat
 result = stat / 2 // Divide value of stat by number
 result = stat ** other_stat // Raise value of stat to the power of the value of other_stat
 ```
+
+## `/stat/vital`
+
+### `operator<<=(stat/s)`
+This operator decrements the `current` value of the statistic by `s`. It can accept another statistic, a number, or a list of these. In case `s` is a statistic, the `current` value is reduced by the `value` of `s`. If `s` is a list, each item in `s` is used to decrement the `current` value.
+```dm
+stat <<= other_stat // Decrement current value of stat by the value of other_stat
+stat <<= 5 // Decrement current value of stat by 5
+stat <<= list(1, other_stat) // Decrement current value of stat by 1 and the value of other_stat
+```
+
+### `operator>>=(stat/s)`
+This operator increments the `current` value of the statistic by `s`. It can accept another statistic, a number, or a list of these. In case `s` is a statistic, the `current` value is increased by the `value` of `s`. If `s` is a list, each item in `s` is used to increment the `current` value.
+```dm
+stat >>= other_stat // Increment current value of stat by the value of other_stat
+stat >>= 10 // Increment current value of stat by 10
+stat >>= list(3, other_stat) // Increment current value of stat by 3 and the value of other_stat
+```
+
 
 # Event Handling
 
