@@ -56,9 +56,10 @@ stat
 			base = base_limit.Clamp(base)
 		pause_update = TRUE
 		if(multiplier != null)
-			if(!multiplier.locs)
-				multiplier.locs = new
-			multiplier.locs |= src
+			if(istype(multiplier, /stat))
+				if(!multiplier.locs)
+					multiplier.locs = new
+				multiplier.locs |= src
 		src += args
 		pause_update = FALSE
 		Update()
