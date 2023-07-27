@@ -35,10 +35,10 @@ stat
 			stat/limit/current_limit
 			auto_adjust = TRUE
 
-			recovery_delay = 10
 			tmp
 				recovery_next
 			stat
+				recovery_delay = 10
 				recovery_rate = 1
 		Update()
 			. = value
@@ -62,10 +62,10 @@ stat
 		proc
 			Recovery()
 				if(recovery_next == null)
-					recovery_next = world.time + recovery_delay
+					recovery_next = recovery_delay + world.time
 				else if(recovery_next <= world.time)
 					src >>= min(value - current, isnum(recovery_rate) ? recovery_rate : recovery_rate.value)
-					recovery_next = world.time + recovery_delay
+					recovery_next = recovery_delay + world.time
 					if(current >= value)
 						recovery_next = null
 						#if DM_VERSION < 515
